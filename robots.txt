@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# AI answer engines are welcome to read and cite public content
+User-agent: GPTBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://www.simplicityinvesting.com/sitemap.xml
