@@ -1,0 +1,1492 @@
+<title>Simplicity Investing Prototype</title>
+<meta name="description" content="Prototype of the redesigned Simplicity Investing website, including a Global / GIFT City investing hub.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: calm single-column landing; wide hero, alternating paper/tint bands, one deep-teal band; tools sit in framed panels. */
+:root {
+  --paper: #f4f6f3;
+  --tint: #e9eeea;
+  --surface: #ffffff;
+  --ink: #10211f;
+  --muted: #536461;
+  --line: #d3dcd7;
+  --teal: #0d4a47;
+  --teal-2: #17625e;
+  --sprout: #2a9d6e;
+  --saffron: #c9861a;
+  --saffron-soft: #f6e6c6;
+  --on-teal: #f1f7f4;
+  --band: #0d3d3b;
+  --band-ink: #e3efeb;
+  --band-muted: #a9c4bd;
+  --band-line: #2a5754;
+  --foot: #0a201f;
+  --foot-ink: #b7c9c4;
+  --good: #1d8a5f;
+  --warn: #b5481f;
+  --shadow: 0 1px 2px rgb(13 74 71 / .06), 0 14px 32px -16px rgb(13 74 71 / .22);
+  --band-panel: #135653;
+  --band-pos: #6fe0ae;
+  --band-neg: #ffa27f;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 14px;
+  --r-sm: 8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1514; --tint: #111d1c; --surface: #152321; --ink: #e6eeeb; --muted: #95a8a3;
+    --line: #273835; --teal: #82d8bf; --teal-2: #9ee3cf; --sprout: #46c98f; --saffron: #e6b052;
+    --saffron-soft: #3a2e17; --on-teal: #08201d; --band: #0f2a28; --band-ink: #e3efeb; --band-muted: #9fbab3;
+    --band-line: #26514c; --foot: #070f0e; --foot-ink: #9fb3ae; --good: #4fd09a; --warn: #f08a62;
+    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 14px 32px -16px rgb(0 0 0 / .7);
+    --band-panel: #173b38; --band-pos: #63d6a2; --band-neg: #f59a78;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1514; --tint: #111d1c; --surface: #152321; --ink: #e6eeeb; --muted: #95a8a3;
+  --line: #273835; --teal: #82d8bf; --teal-2: #9ee3cf; --sprout: #46c98f; --saffron: #e6b052;
+  --saffron-soft: #3a2e17; --on-teal: #08201d; --band: #0f2a28; --band-ink: #e3efeb; --band-muted: #9fbab3;
+  --band-line: #26514c; --foot: #070f0e; --foot-ink: #9fb3ae; --good: #4fd09a; --warn: #f08a62;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 14px 32px -16px rgb(0 0 0 / .7);
+  --band-panel: #173b38; --band-pos: #63d6a2; --band-neg: #f59a78;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: clip; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: clip;
+}
+h1, h2, h3, h4 { margin: 0; line-height: 1.12; text-wrap: balance; }
+h1, h2 { font-family: var(--f-display); font-weight: 700; letter-spacing: -.025em; }
+h1 { font-size: clamp(2.6rem, 6.4vw, 4.8rem); }
+h2 { font-size: clamp(1.75rem, 3.6vw, 2.7rem); }
+h3 { font-size: 1.12rem; font-weight: 700; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--sprout); outline-offset: 3px; border-radius: 6px; }
+.num, output, .mono { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+
+.wrap { width: min(1160px, 100%); margin-inline: auto; padding-inline: 16px; }
+@media (min-width: 700px) { .wrap { padding-inline: 32px; } }
+.narrow { width: min(860px, 100%); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+.fine { font-size: .76rem; color: var(--muted); }
+.stack { display: grid; gap: 14px; align-content: start; }
+.eyebrow { font-family: var(--f-data); font-size: .76rem; letter-spacing: .08em; text-transform: uppercase; color: var(--teal-2); }
+
+/* Prototype ribbon */
+.ribbon { background: var(--saffron-soft); color: var(--ink); font-size: .82rem; }
+.ribbon .wrap { display: flex; gap: 8px 16px; flex-wrap: wrap; padding-block: 8px; align-items: center; }
+.ribbon strong { font-family: var(--f-data); font-weight: 500; letter-spacing: .04em; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .4em;
+  padding: .8em 1.3em; border-radius: 999px; font: 600 .97rem var(--f-body);
+  text-decoration: none; border: 1.5px solid transparent; cursor: pointer; transition: transform .2s, background .2s, border-color .2s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--teal); color: var(--on-teal); }
+.btn-primary:hover { background: var(--teal-2); }
+.btn-ghost { background: transparent; color: var(--teal); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--teal); }
+.btn-band { background: var(--band-ink); color: var(--band); }
+.btn-sm { padding: .55em 1.05em; font-size: .9rem; }
+.btn-block { width: 100%; }
+
+/* Header */
+.site-header {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40;
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
+  border-bottom: 1px solid var(--line);
+}
+.nav { display: flex; align-items: center; gap: 20px; min-height: 66px; position: relative; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; letter-spacing: -.01em; }
+.brand svg { width: 30px; height: 30px; flex: none; }
+.brand .lite { font-weight: 500; color: var(--muted); }
+.nav-menu { display: flex; gap: 22px; list-style: none; margin: 0 0 0 auto; padding: 0; }
+.nav-menu a { text-decoration: none; font-size: .93rem; font-weight: 500; color: var(--muted); }
+.nav-menu a:hover, .nav-menu a.hot { color: var(--ink); }
+.nav-menu a.hot::after { content: "New"; font: 500 .62rem var(--f-data); background: var(--saffron); color: var(--paper); padding: 1px 5px; border-radius: 4px; margin-left: 6px; vertical-align: 2px; }
+.nav-actions { display: flex; gap: 8px; align-items: center; }
+.icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+.icon-btn svg { width: 18px; height: 18px; }
+.nav-toggle { display: none; }
+
+/* Hero */
+.hero { padding-block: clamp(44px, 7vw, 96px) clamp(48px, 7vw, 88px); }
+.hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
+.hero h1 em { font-style: normal; color: var(--teal-2); }
+.lead { font-size: 1.18rem; color: var(--muted); max-width: 33em; margin-top: 20px; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.creds { display: flex; flex-wrap: wrap; gap: 8px; margin: 30px 0 0; padding: 0; list-style: none; }
+.creds li { font-family: var(--f-data); font-size: .78rem; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; color: var(--muted); }
+.creds b { color: var(--ink); font-weight: 500; }
+
+.hero-panel { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: 24px; display: grid; gap: 16px; }
+.hp-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.hp-head h3 { font-size: 1rem; }
+.pill { display: inline-block; font: 500 .72rem var(--f-data); padding: 3px 9px; border-radius: 999px; }
+.pill-good { background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); }
+.pill-new { background: var(--saffron-soft); color: var(--saffron); }
+.hp-big { font-family: var(--f-display); font-size: 3.2rem; font-weight: 700; line-height: 1; letter-spacing: -.03em; }
+.hp-chart { width: 100%; height: auto; display: block; }
+.hp-rows { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px; }
+.hp-row { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; }
+.hp-row span:last-child { font-family: var(--f-data); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .8rem; color: var(--muted); }
+.key { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.key-a { background: var(--sprout); }
+.key-b { background: var(--muted); }
+.key-c { background: var(--teal-2); }
+
+/* Sections */
+.section { padding-block: clamp(60px, 8vw, 104px); }
+.tint { background: var(--tint); }
+.head { display: grid; gap: 12px; max-width: 700px; margin-bottom: 40px; }
+.head-row { display: flex; justify-content: space-between; align-items: end; gap: 16px; flex-wrap: wrap; max-width: none; }
+
+.grid { display: grid; gap: 16px; }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.svc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 10px; align-content: start; transition: border-color .2s, transform .2s; }
+.svc:hover { border-color: var(--teal-2); transform: translateY(-3px); }
+.svc p { color: var(--muted); font-size: .94rem; }
+.svc .instr { font-family: var(--f-data); font-size: .72rem; color: var(--teal-2); letter-spacing: .02em; }
+.svc.feature { border-color: var(--saffron); background: linear-gradient(170deg, var(--saffron-soft), var(--surface) 70%); }
+.svc.feature .instr { color: var(--saffron); }
+
+/* Global hub */
+.global-intro { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: end; margin-bottom: 36px; }
+.alert { border-left: 3px solid var(--saffron); background: var(--surface); padding: 16px 18px; border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: .95rem; }
+.alert b { font-family: var(--f-data); font-weight: 500; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+.tab { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 14px; font: 600 .95rem var(--f-body); color: var(--muted); cursor: pointer; margin-bottom: -1px; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--teal); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(18px, 3vw, 30px); }
+
+.finder { display: grid; grid-template-columns: 1fr 1.1fr; gap: 28px; }
+.q-label { font-weight: 600; font-size: .95rem; margin-bottom: 10px; display: block; }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0 0 22px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: inline-block; padding: .5em 1em; border-radius: 999px; border: 1.5px solid var(--line); cursor: pointer; font-size: .9rem; font-weight: 500; }
+.seg input:checked + span { background: var(--teal); color: var(--on-teal); border-color: var(--teal); }
+.seg input:focus-visible + span { outline: 3px solid var(--sprout); outline-offset: 2px; }
+.route { background: var(--tint); border-radius: var(--r); padding: 22px; display: grid; gap: 12px; align-content: start; }
+.route h3 { font-family: var(--f-display); font-size: 1.45rem; letter-spacing: -.015em; }
+.route dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 4px 0 0; font-size: .9rem; }
+.route dt { color: var(--muted); }
+.route dd { margin: 0; }
+.route .warn { color: var(--warn); font-size: .88rem; }
+
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: .9rem; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th { font-family: var(--f-data); font-weight: 500; font-size: .76rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+thead th.hl { color: var(--teal-2); }
+tbody th { font-weight: 600; width: 22%; }
+td.hl { background: color-mix(in srgb, var(--sprout) 8%, transparent); }
+.yes { color: var(--good); font-weight: 600; }
+.no { color: var(--warn); font-weight: 600; }
+
+.calc { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.field { display: grid; gap: 6px; }
+.field label { display: flex; justify-content: space-between; gap: 8px; font-size: .9rem; font-weight: 500; }
+.field output { color: var(--teal-2); white-space: nowrap; }
+input[type="range"] { width: 100%; accent-color: var(--teal-2); cursor: pointer; }
+.meter { height: 12px; border-radius: 99px; background: var(--tint); overflow: hidden; display: flex; }
+.meter i { display: block; height: 100%; }
+.meter .m-prior { background: var(--muted); }
+.meter .m-new { background: var(--sprout); }
+.kv { display: grid; gap: 10px; }
+.kv div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 8px; font-size: .94rem; }
+.kv b { font-family: var(--f-data); font-weight: 500; }
+.kv .big b { font-family: var(--f-display); font-size: 1.6rem; font-weight: 700; }
+
+.shelf-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: .4em .95em; font: 500 .86rem var(--f-body); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: var(--on-teal); }
+.fund { border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: grid; gap: 10px; align-content: start; background: var(--surface); }
+.fund-top { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+.fund h3 { font-size: 1rem; }
+.fund .meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.tagm { font: 500 .7rem var(--f-data); padding: 2px 7px; border-radius: 5px; background: var(--tint); color: var(--muted); }
+.tagm.res { color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); }
+.fund p { font-size: .88rem; color: var(--muted); }
+.fund .min { font-family: var(--f-data); font-size: .85rem; }
+
+/* Steps */
+.steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.steps li { border-top: 2px solid var(--teal); padding-top: 18px; display: grid; gap: 8px; align-content: start; }
+.steps .n { font-family: var(--f-data); font-size: .8rem; color: var(--teal-2); }
+.steps p { color: var(--muted); font-size: .94rem; }
+
+/* Planner */
+.planner { display: grid; grid-template-columns: 1.15fr 1fr; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.planner form { padding: clamp(18px, 3vw, 32px); display: grid; gap: 20px; }
+.planner .result { padding: clamp(18px, 3vw, 32px); background: var(--tint); display: grid; gap: 14px; align-content: start; }
+.row3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.res-big { font-family: var(--f-display); font-weight: 700; font-size: clamp(2rem, 4vw, 2.8rem); letter-spacing: -.02em; line-height: 1.05; }
+.res-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.res-mid { font-family: var(--f-data); font-size: 1.3rem; }
+.res-mid.acc { color: var(--good); }
+#planner-chart { width: 100%; height: auto; }
+
+/* Quiz */
+.quiz { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(18px, 3vw, 32px); }
+.qbar { height: 6px; background: var(--tint); border-radius: 99px; overflow: hidden; margin-bottom: 22px; }
+.qbar span { display: block; height: 100%; width: 0; background: var(--sprout); transition: width .35s; }
+.quiz-q { font-family: var(--f-display); font-weight: 700; font-size: 1.4rem; letter-spacing: -.01em; margin: 6px 0 18px; }
+.opts { display: grid; gap: 10px; }
+.opt { text-align: left; padding: 13px 16px; border-radius: var(--r-sm); border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); font: inherit; cursor: pointer; transition: border-color .2s; }
+.opt:hover { border-color: var(--teal-2); }
+.qres { display: grid; gap: 14px; justify-items: center; text-align: center; }
+.qres ul { text-align: left; max-width: 540px; margin: 0; padding-left: 1.2em; color: var(--muted); display: grid; gap: 6px; }
+.qres .acts { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+/* Trends */
+.trend { border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 8px; align-content: start; }
+.trend .eyebrow { color: var(--saffron); }
+.trend p { color: var(--muted); font-size: .94rem; }
+
+/* Band */
+.band { background: var(--band); color: var(--band-ink); }
+.band .eyebrow { color: var(--band-muted); }
+.band-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center; }
+.band-grid > div { display: grid; gap: 18px; justify-items: start; }
+.band p { color: var(--band-muted); }
+.values { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.values li { border: 1px solid var(--band-line); border-radius: var(--r); padding: 20px; display: grid; gap: 6px; }
+.values h3 { color: var(--band-ink); }
+
+/* Insights */
+.insight { display: grid; gap: 10px; text-decoration: none; align-content: start; }
+.insight .art { aspect-ratio: 16 / 9; max-width: 100%; border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; overflow: hidden; }
+.insight .art svg { width: 100%; height: 100%; }
+.insight h3 { font-size: 1.05rem; }
+.insight:hover h3 { text-decoration: underline; text-underline-offset: 3px; }
+
+/* FAQ */
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; list-style: none; font-weight: 600; font-size: 1.04rem; padding: 18px 36px 18px 0; position: relative; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); font: 400 1.5rem var(--f-data); color: var(--teal-2); }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { color: var(--muted); padding-bottom: 16px; max-width: 65ch; }
+
+/* Contact */
+.contact { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+.contact > div { display: grid; gap: 16px; }
+.clist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; color: var(--muted); }
+.form { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: clamp(18px, 3vw, 30px); display: grid; gap: 16px; }
+.form input:not([type="checkbox"]), .form select { width: 100%; padding: 11px 13px; border-radius: var(--r-sm); border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); font: inherit; }
+.form input:focus, .form select:focus { border-color: var(--teal-2); outline: none; }
+.form [aria-invalid="true"] { border-color: var(--warn) !important; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: .85rem; color: var(--muted); }
+.consent input { margin-top: 4px; accent-color: var(--teal-2); }
+.status { min-height: 1.4em; font-size: .9rem; font-weight: 500; color: var(--good); }
+
+/* Footer */
+.foot { background: var(--foot); color: var(--foot-ink); padding-block: 56px 28px; font-size: .9rem; }
+.foot-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 28px; }
+.foot h4 { color: var(--band-ink); font-size: .9rem; margin-bottom: 12px; }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.foot a { text-decoration: none; }
+.foot a:hover { color: var(--band-ink); }
+.foot .brand { color: var(--band-ink); margin-bottom: 12px; }
+.foot .brand .lite { color: var(--foot-ink); }
+.foot .stack p { font-family: var(--f-data); font-size: .78rem; }
+.disc { border-top: 1px solid var(--band-line); margin-top: 40px; padding-top: 22px; font-size: .8rem; display: grid; gap: 10px; }
+.disc strong { color: var(--band-ink); }
+
+/* Saral AI */
+.saral-intro { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: end; margin-bottom: 32px; }
+.guard { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: .9rem; }
+.guard li { display: flex; gap: 10px; align-items: baseline; }
+.guard li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--sprout); transform: translateY(-1px); }
+.console { background: var(--band); color: var(--band-ink); border-radius: 20px; display: grid; grid-template-columns: 250px minmax(0, 1fr); overflow: hidden; box-shadow: var(--shadow); }
+.rail { border-right: 1px solid var(--band-line); padding: 18px; display: grid; gap: 8px; align-content: start; }
+.rail-head { display: flex; align-items: center; gap: 10px; padding: 4px 4px 12px; border-bottom: 1px solid var(--band-line); margin-bottom: 6px; }
+.avatar { width: 34px; height: 34px; border-radius: 10px; background: var(--band-pos); color: var(--band); display: grid; place-items: center; font: 700 1rem var(--f-display); flex: none; }
+.rail-head b { font-family: var(--f-display); font-size: 1.1rem; display: block; line-height: 1.1; }
+.rail-head span { font-size: .75rem; color: var(--band-muted); }
+.mode { text-align: left; background: transparent; border: 1px solid transparent; color: var(--band-ink); border-radius: 12px; padding: 12px; cursor: pointer; font: inherit; display: grid; gap: 2px; }
+.mode b { font-size: .95rem; }
+.mode span { font-size: .8rem; color: var(--band-muted); line-height: 1.4; }
+.mode:hover { border-color: var(--band-line); }
+.mode[aria-pressed="true"] { background: var(--band-panel); border-color: var(--band-line); }
+.convo { display: grid; grid-template-rows: minmax(0, 1fr) auto auto; min-height: 560px; max-height: 680px; }
+.feed { overflow-y: auto; padding: 22px; display: grid; gap: 14px; align-content: start; }
+.msg { max-width: 92%; display: grid; gap: 10px; }
+.msg.user { justify-self: end; background: var(--band-panel); border: 1px solid var(--band-line); padding: 10px 14px; border-radius: 14px 14px 4px 14px; font-size: .95rem; }
+.msg.bot { justify-self: start; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; max-width: 100%; }
+.msg.bot .avatar { width: 30px; height: 30px; font-size: .85rem; border-radius: 9px; }
+.bot-body { display: grid; gap: 12px; font-size: .95rem; min-width: 0; }
+.bot-body p { color: var(--band-ink); }
+.xcard { background: var(--band-panel); border: 1px solid var(--band-line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.xcard h4 { font-family: var(--f-data); font-weight: 500; font-size: .74rem; letter-spacing: .07em; text-transform: uppercase; color: var(--band-muted); }
+.score-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.score-row .big { font-family: var(--f-display); font-size: 2.6rem; font-weight: 700; line-height: 1; }
+.score-row .big small { font-size: 1rem; color: var(--band-muted); font-weight: 500; }
+.find { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.find li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: .9rem; }
+.sev { font: 500 .68rem var(--f-data); text-transform: uppercase; letter-spacing: .05em; padding: 2px 7px; border-radius: 5px; text-align: center; }
+.sev.act { background: color-mix(in srgb, var(--band-neg) 22%, transparent); color: var(--band-neg); }
+.sev.rev { background: color-mix(in srgb, var(--saffron) 26%, transparent); color: var(--band-ink); }
+.sev.opp, .sev.ok { background: color-mix(in srgb, var(--band-pos) 20%, transparent); color: var(--band-pos); }
+.impact-big { font-family: var(--f-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+.impact-big.neg { color: var(--band-neg); }
+.impact-big.pos { color: var(--band-pos); }
+.bars { display: grid; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 52px; gap: 10px; align-items: center; font-size: .82rem; }
+.bar-row .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--band-muted); }
+.track { position: relative; height: 10px; }
+.track::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--band-line); }
+.track i { position: absolute; top: 0; height: 100%; border-radius: 3px; }
+.bar-row .v { font-family: var(--f-data); text-align: right; }
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cols2 ul { margin: 0; padding-left: 1.1em; display: grid; gap: 4px; font-size: .88rem; color: var(--band-muted); }
+.cols2 h5 { margin: 0 0 6px; font-size: .85rem; }
+.opt-table { width: 100%; min-width: 0; font-size: .85rem; border-collapse: collapse; }
+.opt-table th, .opt-table td { border-bottom: 1px solid var(--band-line); padding: 8px 6px; text-align: left; vertical-align: top; }
+.opt-table thead th { color: var(--band-muted); font-size: .7rem; }
+.next { border-left: 3px solid var(--band-pos); padding: 4px 0 4px 12px; font-size: .92rem; }
+.meta-line { font: 400 .74rem var(--f-data); color: var(--band-muted); }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.bbtn { border: 1px solid var(--band-line); background: transparent; color: var(--band-ink); border-radius: 999px; padding: .45em .95em; font: 600 .85rem var(--f-body); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.bbtn.solid { background: var(--band-pos); color: var(--band); border-color: var(--band-pos); }
+.bbtn:hover { border-color: var(--band-pos); }
+.suggest { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 22px; border-top: 1px solid var(--band-line); }
+.sg { border: 1px dashed var(--band-line); background: transparent; color: var(--band-ink); border-radius: 999px; padding: .4em .9em; font: 500 .84rem var(--f-body); cursor: pointer; }
+.sg:hover { border-style: solid; border-color: var(--band-pos); }
+.ask { display: flex; gap: 8px; padding: 12px 22px 18px; }
+.ask input { flex: 1; min-width: 0; background: var(--band-panel); border: 1px solid var(--band-line); color: var(--band-ink); border-radius: 999px; padding: 11px 16px; font: inherit; }
+.ask input::placeholder { color: var(--band-muted); }
+.ask input:focus { outline: 2px solid var(--band-pos); outline-offset: 1px; }
+.cta-row { margin-top: 20px; }
+.cta-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 12px; align-content: start; }
+.cta-card p { color: var(--muted); font-size: .93rem; }
+.cta-card .btn { justify-self: start; }
+.file-btn { position: relative; overflow: hidden; }
+.file-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.cta-card .status { font-size: .85rem; }
+
+/* Tax */
+.tax-grid { display: grid; grid-template-columns: 1fr 1.05fr; gap: 28px; }
+.money { display: grid; gap: 16px; }
+.duel { display: grid; gap: 10px; }
+.duel-row { display: grid; grid-template-columns: 96px minmax(0, 1fr) 110px; gap: 12px; align-items: center; font-size: .92rem; }
+.duel-row .track2 { height: 14px; border-radius: 4px; background: var(--tint); overflow: hidden; }
+.duel-row .track2 i { display: block; height: 100%; border-radius: 4px; }
+.duel-row b { font-family: var(--f-data); font-weight: 500; text-align: right; }
+.winner { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.winner .res-big { font-size: clamp(1.7rem, 3.4vw, 2.3rem); }
+.todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.todo li { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; display: grid; gap: 4px; background: var(--paper); }
+.todo li b { font-size: .95rem; }
+.todo li span { font-size: .87rem; color: var(--muted); }
+.todo a { font-weight: 600; font-size: .87rem; color: var(--teal-2); }
+.dates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.date { border-top: 2px solid var(--saffron); padding-top: 10px; display: grid; gap: 2px; }
+.date b { font-family: var(--f-data); font-weight: 500; font-size: .85rem; }
+.date span { font-size: .85rem; color: var(--muted); }
+.num-in { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+@media (max-width: 1000px) {
+  .saral-intro, .tax-grid { grid-template-columns: 1fr; }
+  .console { grid-template-columns: 1fr; }
+  .rail { border-right: 0; border-bottom: 1px solid var(--band-line); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .rail-head { grid-column: 1 / -1; }
+  .dates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .rail { grid-template-columns: 1fr; }
+  .mode span { display: none; }
+  .cols2, .num-in { grid-template-columns: 1fr; }
+  .find li { grid-template-columns: 1fr; gap: 4px; }
+  .find .sev { justify-self: start; }
+  .duel-row { grid-template-columns: 70px minmax(0, 1fr) 92px; }
+  .feed, .suggest, .ask { padding-inline: 14px; }
+  .convo { min-height: 520px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+@media (max-width: 1000px) {
+  .g4, .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .planner, .finder, .calc, .global-intro { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .nav-toggle { display: grid; }
+  .nav-menu { display: none; position: absolute; top: 100%; left: -16px; right: -16px; flex-direction: column; gap: 0; background: var(--paper); border-bottom: 1px solid var(--line); padding: 6px 16px 14px; margin: 0; }
+  .nav-menu.open { display: flex; }
+  .nav-menu a { display: block; padding: 11px 0; font-size: 1.02rem; }
+  .nav-actions { margin-left: auto; }
+  .nav-actions .btn { display: none; }
+  .hero-grid, .band-grid, .contact { grid-template-columns: 1fr; gap: 36px; }
+  .g3 { grid-template-columns: 1fr; }
+  .foot-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .g4, .g2, .steps, .values, .row3, .foot-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="ribbon" role="note">
+  <div class="wrap"><strong>PROTOTYPE v2</strong><span>Sample copy and example figures. Fund details, tax rates and contact info need verification before launch.</span></div>
+</div>
+
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Simplicity Investing home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--teal)"/><path d="M7 21c4-1 6-4 9-8s5-5 9-5" stroke="var(--paper)" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="25" cy="8" r="2.4" fill="var(--sprout)"/></svg>
+      <span>Simplicity <span class="lite">Investing</span></span>
+    </a>
+    <ul id="nav-menu" class="nav-menu">
+      <li><a href="#solutions">Solutions</a></li>
+      <li><a href="#saral" class="hot">Saral AI</a></li>
+      <li><a href="#tax">Tax planner</a></li>
+      <li><a href="#global">Global</a></li>
+      <li><a href="#planner">Goal planner</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch light or dark theme">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn nav-toggle" id="nav-btn" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+      </button>
+      <a class="btn btn-primary btn-sm" href="#contact">Book a free review</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Goal-based investing · Pune · since 2011</p>
+        <h1>Wealth, <em>made simple.</em></h1>
+        <p class="lead">Retirement, your children's education, a global portfolio, your business cash. We turn each goal into a one-page plan, the right funds, and a calm review rhythm.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#planner">Plan a goal in 60 seconds</a>
+          <a class="btn btn-ghost" href="#saral">Get a free AI portfolio X-ray</a>
+        </div>
+        <ul class="creds" aria-label="Credentials">
+          <li><b>AMFI</b> ARN-87401</li>
+          <li><b>15+ yrs</b> in practice</li>
+          <li><b>India</b> + NRI clients</li>
+        </ul>
+      </div>
+
+      <div class="hero-panel" aria-label="Example client goal summary">
+        <div class="hp-head">
+          <h3>Retirement at 60 <span class="muted small">· example client</span></h3>
+          <span class="pill pill-good">On track</span>
+        </div>
+        <div>
+          <p class="hp-big">84%</p>
+          <p class="muted small">of goal funded on current plan</p>
+        </div>
+        <svg class="hp-chart" viewBox="0 0 320 120" role="img" aria-label="Projected corpus rising faster than a savings account over 25 years">
+          <line x1="0" y1="110" x2="320" y2="110" stroke="var(--line)" stroke-width="1"/>
+          <line x1="0" y1="72" x2="320" y2="72" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>
+          <line x1="0" y1="34" x2="320" y2="34" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>
+          <path d="M0 108 C70 104 120 96 170 82 S260 44 320 14 L320 110 L0 110Z" fill="var(--sprout)" fill-opacity=".14"/>
+          <path d="M0 108 C70 104 120 96 170 82 S260 44 320 14" fill="none" stroke="var(--sprout)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M0 108 L320 90" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5"/>
+          <circle cx="320" cy="14" r="4" fill="var(--sprout)"/>
+        </svg>
+        <div class="legend"><span><i class="key key-a"></i>SIP plan, 10% yearly step-up</span><span><i class="key key-b"></i>Savings account</span></div>
+        <div class="hp-rows">
+          <div class="hp-row"><span>Monthly SIP</span><span>₹30,800</span></div>
+          <div class="hp-row"><span>Nominees</span><span>3 of 3 updated</span></div>
+          <div class="hp-row"><span>Next review</span><span>Jan 2027</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTIONS -->
+  <section id="solutions" class="section tint">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">What we do</p>
+        <h2>One partner for every money goal</h2>
+        <p class="muted">We start with the goal, then choose funds from across fund houses. Every plan fits on one page.</p>
+      </div>
+      <div class="grid g4">
+        <article class="svc"><p class="instr">SIP · SWP · NPS</p><h3>Retirement</h3><p>Build the corpus now, then draw a tax-efficient monthly income from it.</p></article>
+        <article class="svc"><p class="instr">Step-up SIP · Flexi-cap · Index</p><h3>Wealth creation</h3><p>Diversified funds matched to your time horizon and comfort with risk.</p></article>
+        <article class="svc"><p class="instr">ELSS · Old vs new regime</p><h3>Tax-smart investing</h3><p>Save tax where it helps, and harvest gains without letting tax drive every decision.</p></article>
+        <article class="svc"><p class="instr">Term · Health · Emergency fund</p><h3>Protection</h3><p>Cover sized to your real liabilities, and an emergency fund you can reach in a day.</p></article>
+        <article class="svc feature"><p class="instr">GIFT City · LRS · NSE IX</p><h3>Global investing <span class="pill pill-new">New</span></h3><p>Regulated routes to global markets while most Indian international funds are closed to new SIPs.</p></article>
+        <article class="svc"><p class="instr">Nominations · Will · Records</p><h3>Estate &amp; legacy</h3><p>Every account nominated and documented, so your family never has to search.</p></article>
+        <article class="svc"><p class="instr">Liquid · Overnight · Short duration</p><h3>Business treasury</h3><p>Surplus company cash placed on a liquidity ladder that matches your payables.</p></article>
+        <article class="svc"><p class="instr">SIF · ₹10 lakh minimum</p><h3>Specialized Investment Funds</h3><p>SEBI's newer category between mutual funds and PMS, with strategies such as long-short equity.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- SARAL AI -->
+  <section id="saral" class="section">
+    <div class="wrap">
+      <div class="saral-intro">
+        <div class="head" style="margin-bottom:0">
+          <p class="eyebrow">Saral AI · your money co-pilot</p>
+          <h2>Meet Saral. It reads your portfolio, watches the world, and helps you decide.</h2>
+          <p class="muted">Saral means simple. Upload your mutual fund statement and Saral checks your portfolio's health. It also shows how today's global events affect your money and sets out your options before any big decision.</p>
+        </div>
+        <ul class="guard" aria-label="How Saral protects you">
+          <li>Reads only what you share: a CAS upload or Account Aggregator consent</li>
+          <li>Shows the data and reasoning behind every answer</li>
+          <li>Never moves money or places transactions on its own</li>
+          <li>A Simplicity expert reviews any action before it happens</li>
+        </ul>
+      </div>
+
+      <div class="console" aria-label="Saral AI demo">
+        <div class="rail">
+          <div class="rail-head"><span class="avatar" aria-hidden="true">S</span><div><b>Saral</b><span>Demo · sample portfolio ₹48.6 L</span></div></div>
+          <button class="mode" type="button" data-mode="xray" aria-pressed="true"><b>Portfolio X-ray</b><span>Health score, overlap, drift, nominee gaps, tax</span></button>
+          <button class="mode" type="button" data-mode="radar" aria-pressed="false"><b>Event Radar</b><span>How a global event moves your portfolio</span></button>
+          <button class="mode" type="button" data-mode="desk" aria-pressed="false"><b>Decision Desk</b><span>Options, trade-offs and a next step</span></button>
+        </div>
+        <div class="convo">
+          <div class="feed" id="feed" aria-live="polite"></div>
+          <div class="suggest" id="suggest" aria-label="Suggested questions"></div>
+          <form class="ask" id="ask-form">
+            <label class="sr-only" for="ask-input">Ask Saral</label>
+            <input id="ask-input" autocomplete="off" placeholder="Ask about your portfolio, an event, or a decision">
+            <button class="bbtn solid" type="submit">Ask</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="grid g3 cta-row">
+        <div class="cta-card">
+          <p class="eyebrow">Portfolio X-ray</p>
+          <h3>Get your free health score in 2 minutes</h3>
+          <p>Upload your Consolidated Account Statement (CAS) from CAMS or KFintech. Saral checks allocation, overlap, costs, nominees and tax.</p>
+          <label class="btn btn-primary file-btn" for="cas-file">Upload my CAS (PDF)<input type="file" id="cas-file" accept="application/pdf"></label>
+          <p class="status" id="cas-status" role="status"></p>
+        </div>
+        <div class="cta-card">
+          <p class="eyebrow">Event Radar</p>
+          <h3>Get alerted when the world moves your money</h3>
+          <p>A WhatsApp note when a global event could move your portfolio by more than 2%, with what it means and what to do.</p>
+          <a class="btn btn-primary" href="#contact" data-interest="Saral Event Radar alerts">Turn on Event Radar</a>
+        </div>
+        <div class="cta-card">
+          <p class="eyebrow">Decision Desk</p>
+          <h3>Decide big money moves with a brief and an expert</h3>
+          <p>Bonus, market fall, home purchase, moving abroad. Get Saral's decision brief and a 15-minute call with an expert.</p>
+          <a class="btn btn-primary" href="#contact" data-interest="Saral AI portfolio X-ray">Book a decision call</a>
+        </div>
+      </div>
+      <p class="fine" style="margin-top:14px">Prototype demo on a sample portfolio with illustrative figures. Saral explains information and options. It does not execute transactions, and final decisions are yours, made with a qualified Simplicity expert.</p>
+    </div>
+  </section>
+
+  <!-- TAX PLANNER -->
+  <section id="tax" class="section tint">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Tax planner · tax year 2026-27</p>
+        <h2>Old or new regime? Find out in 30 seconds, then act before 31 March.</h2>
+        <p class="muted">Compare both regimes on your salary and deductions. See exactly what to invest, harvest or claim, and what not to buy just for tax.</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Tax tools">
+        <button class="tab" role="tab" id="tab-regime" aria-controls="p-regime" aria-selected="true">Regime comparison</button>
+        <button class="tab" role="tab" id="tab-harvest" aria-controls="p-harvest" aria-selected="false" tabindex="-1">Capital gains harvesting</button>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-regime" aria-labelledby="tab-regime">
+        <div class="tax-grid">
+          <form class="stack" id="tax-form" style="gap:18px">
+            <div class="field"><label for="tx-gross">Annual salary (gross) <output id="tx-gross-out"></output></label><input type="range" id="tx-gross" min="500000" max="10000000" step="50000" value="1800000"></div>
+            <div class="field"><label for="tx-80c">80C investments: EPF, PPF, ELSS, insurance <output id="tx-80c-out"></output></label><input type="range" id="tx-80c" min="0" max="150000" step="5000" value="100000"></div>
+            <div class="num-in">
+              <div class="field"><label for="tx-80d">Health insurance (80D) <output id="tx-80d-out"></output></label><input type="range" id="tx-80d" min="0" max="100000" step="5000" value="25000"></div>
+              <div class="field"><label for="tx-nps">Own NPS, 80CCD(1B) <output id="tx-nps-out"></output></label><input type="range" id="tx-nps" min="0" max="50000" step="5000" value="0"></div>
+              <div class="field"><label for="tx-hl">Home loan interest <output id="tx-hl-out"></output></label><input type="range" id="tx-hl" min="0" max="200000" step="10000" value="0"></div>
+              <div class="field"><label for="tx-hra">HRA exemption <output id="tx-hra-out"></output></label><input type="range" id="tx-hra" min="0" max="600000" step="10000" value="0"></div>
+            </div>
+            <div class="field"><label for="tx-enps">Employer NPS, 80CCD(2) (both regimes) <output id="tx-enps-out"></output></label><input type="range" id="tx-enps" min="0" max="300000" step="10000" value="0"></div>
+            <p class="fine">Resident individual under 60. New regime: ₹75,000 standard deduction, zero tax up to ₹12 lakh taxable income. Old regime: ₹50,000 standard deduction. Includes 4% cess; surcharge above ₹50 lakh is approximate. Section 80C is Section 123 under the Income Tax Act 2025.</p>
+          </form>
+
+          <div class="money" aria-live="polite">
+            <div class="winner"><p class="res-big" id="tx-win">—</p><span class="pill pill-good" id="tx-save">—</span></div>
+            <div class="duel">
+              <div class="duel-row"><span>New regime</span><div class="track2"><i id="tx-bar-new" style="background:var(--sprout)"></i></div><b id="tx-new">—</b></div>
+              <div class="duel-row"><span>Old regime</span><div class="track2"><i id="tx-bar-old" style="background:var(--teal-2)"></i></div><b id="tx-old">—</b></div>
+            </div>
+            <p class="small muted" id="tx-break"></p>
+            <div>
+              <p class="eyebrow" style="margin-bottom:10px">Your action list</p>
+              <ul class="todo" id="tx-todo"></ul>
+            </div>
+            <a class="btn btn-primary" href="#contact" data-interest="Tax planning">Get my tax plan reviewed</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" role="tabpanel" id="p-harvest" aria-labelledby="tab-harvest" hidden>
+        <div class="tax-grid">
+          <form class="stack" id="hv-form" style="gap:18px">
+            <div class="field"><label for="hv-unreal">Unbooked long-term gains in equity funds (held over 12 months) <output id="hv-unreal-out"></output></label><input type="range" id="hv-unreal" min="0" max="1000000" step="5000" value="300000"></div>
+            <div class="field"><label for="hv-booked">Long-term gains already booked this tax year <output id="hv-booked-out"></output></label><input type="range" id="hv-booked" min="0" max="300000" step="5000" value="20000"></div>
+            <p class="fine">Equity long-term gains up to ₹1.25 lakh a year are tax-free; above that they're taxed at 12.5% plus cess. Booking gains and reinvesting at once resets your purchase price higher. Check exit loads first.</p>
+          </form>
+          <div class="money" aria-live="polite">
+            <div class="kv">
+              <div class="big"><span>Book this much now, tax-free</span><b id="hv-book">—</b></div>
+              <div><span>Future tax you avoid</span><b id="hv-save">—</b></div>
+              <div><span>Exemption left after this</span><b id="hv-left">—</b></div>
+            </div>
+            <p class="small" id="hv-note"></p>
+            <a class="btn btn-primary" href="#contact" data-interest="Tax planning" style="justify-self:start">Book a harvesting check before 31 March</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="dates" aria-label="Key tax dates">
+        <div class="date"><b>15 Jun · 15 Sep · 15 Dec · 15 Mar</b><span>Advance tax instalments</span></div>
+        <div class="date"><b>31 Jul</b><span>Income tax return due (non-audit)</span></div>
+        <div class="date"><b>Jan – Feb</b><span>Submit investment proofs to your employer</span></div>
+        <div class="date"><b>31 Mar</b><span>Last day for 80C, NPS and gains harvesting</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GLOBAL / GIFT CITY HUB -->
+  <section id="global" class="section">
+    <div class="wrap">
+      <div class="global-intro">
+        <div class="head" style="margin-bottom:0">
+          <p class="eyebrow">Global investing · GIFT City IFSC</p>
+          <h2>Indian international funds are closed for SIPs. There's still a regulated route abroad.</h2>
+          <p class="muted">GIFT City funds are regulated by IFSCA and sit outside the industry's $7 bn overseas cap. Residents invest through LRS. NRIs can also invest into India in US dollars.</p>
+        </div>
+        <p class="alert">As of <b>10 Jul 2026</b>, one Indian international mutual fund was accepting fresh SIPs. LRS lets each resident remit up to <b>$250,000</b> per financial year.</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Global investing tools">
+        <button class="tab" role="tab" id="tab-finder" aria-controls="p-finder" aria-selected="true">Route finder</button>
+        <button class="tab" role="tab" id="tab-compare" aria-controls="p-compare" aria-selected="false" tabindex="-1">Compare routes</button>
+        <button class="tab" role="tab" id="tab-tcs" aria-controls="p-tcs" aria-selected="false" tabindex="-1">LRS &amp; TCS calculator</button>
+        <button class="tab" role="tab" id="tab-shelf" aria-controls="p-shelf" aria-selected="false" tabindex="-1">Fund shelf</button>
+      </div>
+
+      <!-- Route finder -->
+      <div class="panel" role="tabpanel" id="p-finder" aria-labelledby="tab-finder">
+        <div class="finder">
+          <form id="finder-form">
+            <span class="q-label" id="q-res">I am a</span>
+            <fieldset class="seg" aria-labelledby="q-res">
+              <label><input type="radio" name="res" value="resident" id="res-r" checked><span>Resident Indian</span></label>
+              <label><input type="radio" name="res" value="nri" id="res-n"><span>NRI / OCI</span></label>
+            </fieldset>
+            <span class="q-label" id="q-want">I want to</span>
+            <fieldset class="seg" aria-labelledby="q-want">
+              <label><input type="radio" name="want" value="global" id="w-g" checked><span>Own a diversified global portfolio</span></label>
+              <label><input type="radio" name="want" value="stocks" id="w-s"><span>Buy specific US stocks</span></label>
+              <label><input type="radio" name="want" value="india" id="w-i"><span>Invest in India in USD</span></label>
+              <label><input type="radio" name="want" value="fd" id="w-f"><span>Earn interest in USD</span></label>
+            </fieldset>
+            <p class="fine">This is a guide to the available routes, not a recommendation of a specific product.</p>
+          </form>
+          <div class="route" id="route-out" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- Compare -->
+      <div class="panel" role="tabpanel" id="p-compare" aria-labelledby="tab-compare" hidden>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th scope="col">For a resident Indian</th><th scope="col" class="hl">GIFT City outbound fund</th><th scope="col">Direct US broker (LRS)</th><th scope="col">Indian international fund</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Open to new money</th><td class="hl"><span class="yes">Yes</span>. SIP availability varies by fund</td><td><span class="yes">Yes</span></td><td><span class="no">Mostly closed</span>. 1 open for SIPs on 10 Jul 2026</td></tr>
+              <tr><th scope="row">Typical minimum</th><td class="hl num">$500 – $5,000</td><td class="num">From ~$1 (fractional)</td><td class="num">₹500 – ₹5,000</td></tr>
+              <tr><th scope="row">Uses LRS limit / TCS</th><td class="hl">Yes. 20% TCS above ₹10 lakh a year, claimable as credit</td><td>Yes, same rule</td><td>No</td></tr>
+              <tr><th scope="row">US estate tax exposure</th><td class="hl"><span class="yes">None</span> for fund-of-funds holding non-US funds</td><td><span class="no">Yes</span>, above $60,000, up to 40%</td><td>None</td></tr>
+              <tr><th scope="row">Who pays tax on gains</th><td class="hl">The fund pays at trust level. No TDS for the investor*</td><td>You, at Indian rates</td><td>You, under Indian MF rules</td></tr>
+              <tr><th scope="row">Annual reporting</th><td class="hl">One holding to report</td><td>Each stock in Schedule FA</td><td>Normal MF reporting</td></tr>
+              <tr><th scope="row">Regulator</th><td class="hl">IFSCA</td><td>US regulator + RBI LRS</td><td>SEBI</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fine" style="margin-top:12px">*Based on DSP Global Equity Fund (IFSC) disclosures. Tax treatment differs by fund and must be confirmed with a chartered accountant.</p>
+      </div>
+
+      <!-- TCS calculator -->
+      <div class="panel" role="tabpanel" id="p-tcs" aria-labelledby="tab-tcs" hidden>
+        <div class="calc">
+          <form class="stack" id="tcs-form" style="gap:20px">
+            <div class="field">
+              <label for="t-prior">Already sent abroad this financial year <output id="t-prior-out"></output></label>
+              <input type="range" id="t-prior" min="0" max="5000000" step="50000" value="400000">
+            </div>
+            <div class="field">
+              <label for="t-new">Planned GIFT City investment <output id="t-new-out"></output></label>
+              <input type="range" id="t-new" min="50000" max="10000000" step="50000" value="1200000">
+            </div>
+            <div class="field">
+              <label for="t-fx">Assumed ₹ per US$ <output id="t-fx-out"></output></label>
+              <input type="range" id="t-fx" min="80" max="100" step="0.5" value="88">
+            </div>
+            <p class="fine">Applies the 20% TCS rate for investment remittances above ₹10 lakh in a financial year. Education and medical remittances follow different rules.</p>
+          </form>
+          <div class="stack">
+            <div>
+              <p class="small muted" style="margin-bottom:8px">LRS limit used this year (out of $250,000)</p>
+              <div class="meter" aria-hidden="true"><i class="m-prior" id="m-prior"></i><i class="m-new" id="m-new"></i></div>
+              <div class="legend" style="margin-top:8px"><span><i class="key key-b"></i>Already sent</span><span><i class="key key-a"></i>This investment</span></div>
+            </div>
+            <div class="kv" aria-live="polite">
+              <div class="big"><span>TCS collected by your bank</span><b id="t-tcs">—</b></div>
+              <div><span>Total debited from your account</span><b id="t-debit">—</b></div>
+              <div><span>Investment in US dollars</span><b id="t-usd">—</b></div>
+              <div><span>LRS limit left after this</span><b id="t-left">—</b></div>
+            </div>
+            <p class="small" id="t-note"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fund shelf -->
+      <div class="panel" role="tabpanel" id="p-shelf" aria-labelledby="tab-shelf" hidden>
+        <div class="shelf-filters" role="group" aria-label="Filter funds">
+          <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+          <button class="chip" type="button" data-f="resident" aria-pressed="false">Open to residents</button>
+          <button class="chip" type="button" data-f="nri" aria-pressed="false">NRI only</button>
+          <button class="chip" type="button" data-f="low" aria-pressed="false">Minimum under $1,000</button>
+        </div>
+        <div class="grid g3" id="shelf"></div>
+        <p class="fine" style="margin-top:14px">Example shelf built from public announcements. Minimums and eligibility to be confirmed against each scheme's offer document before launch.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section tint">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">How it works</p>
+        <h2>Four steps, then a steady review rhythm</h2>
+      </div>
+      <ol class="steps">
+        <li><span class="n">Step 1</span><h3>Discover</h3><p>A 30-minute conversation about your goals, family, cash flows and worries.</p></li>
+        <li><span class="n">Step 2</span><h3>Plan</h3><p>A one-page plan showing each goal, its monthly amount, and the asset mix behind it.</p></li>
+        <li><span class="n">Step 3</span><h3>Invest</h3><p>Paperless KYC, UPI AutoPay for SIPs, and nominations completed on day one.</p></li>
+        <li><span class="n">Step 4</span><h3>Review</h3><p>Scheduled reviews and rebalancing. We contact you only when something needs a decision.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- PLANNER -->
+  <section id="planner" class="section">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Goal planner</p>
+        <h2>What will your goal really cost, and what does it take?</h2>
+        <p class="muted">Adjusted for inflation, with a yearly SIP step-up. Move the sliders.</p>
+      </div>
+      <div class="planner">
+        <form id="planner-form">
+          <fieldset class="seg" style="margin:0">
+            <legend class="sr-only">Choose a goal</legend>
+            <label><input type="radio" name="goal" value="retirement" id="g-ret" checked><span>Retirement</span></label>
+            <label><input type="radio" name="goal" value="education" id="g-edu"><span>Child's education</span></label>
+            <label><input type="radio" name="goal" value="home" id="g-home"><span>Home</span></label>
+            <label><input type="radio" name="goal" value="freedom" id="g-free"><span>Financial freedom</span></label>
+          </fieldset>
+          <div class="field"><label for="cost">Goal cost in today's money <output id="cost-out"></output></label><input type="range" id="cost" min="500000" max="100000000" step="500000" value="30000000"></div>
+          <div class="field"><label for="years">Years to goal <output id="years-out"></output></label><input type="range" id="years" min="1" max="40" step="1" value="25"></div>
+          <div class="field"><label for="saved">Already invested for it <output id="saved-out"></output></label><input type="range" id="saved" min="0" max="20000000" step="100000" value="1000000"></div>
+          <div class="row3">
+            <div class="field"><label for="ret">Return <output id="ret-out"></output></label><input type="range" id="ret" min="4" max="14" step="0.5" value="11"></div>
+            <div class="field"><label for="inf">Inflation <output id="inf-out"></output></label><input type="range" id="inf" min="3" max="10" step="0.5" value="6"></div>
+            <div class="field"><label for="step">Step-up <output id="step-out"></output></label><input type="range" id="step" min="0" max="20" step="1" value="10"></div>
+          </div>
+        </form>
+        <div class="result" aria-live="polite">
+          <div><p class="small muted">Future cost of this goal</p><p class="res-big" id="future-cost">—</p></div>
+          <div class="res-pair">
+            <div><p class="small muted">Starting monthly SIP</p><p class="res-mid acc" id="sip-need">—</p></div>
+            <div><p class="small muted">Without step-up</p><p class="res-mid" id="sip-flat">—</p></div>
+          </div>
+          <svg id="planner-chart" viewBox="0 0 400 170" role="img" aria-label="Projected value compared with amount invested"></svg>
+          <div class="legend"><span><i class="key key-a"></i>Projected value</span><span><i class="key key-c"></i>Amount you invest</span></div>
+          <a class="btn btn-primary btn-block" href="#contact">Turn this into a real plan</a>
+          <p class="fine">Illustration only. Returns are assumptions, not guarantees. Mutual fund returns move with markets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HEALTH CHECK -->
+  <section id="health" class="section tint">
+    <div class="wrap narrow">
+      <div class="head">
+        <p class="eyebrow">Money health check</p>
+        <h2>Five questions, one score out of 100</h2>
+      </div>
+      <div class="quiz"><div class="qbar"><span id="qbar"></span></div><div id="quiz-body"></div></div>
+    </div>
+  </section>
+
+  <!-- TRENDS -->
+  <section id="trends" class="section">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">What's new in Indian investing</p>
+        <h2>Changes worth knowing about</h2>
+      </div>
+      <div class="grid g3" style="gap:28px">
+        <article class="trend"><p class="eyebrow">Global</p><h3>NSE IX Global Access</h3><p>Since February 2026, residents can buy US-listed stocks, including fractional shares, through GIFT City within their LRS limit.</p></article>
+        <article class="trend"><p class="eyebrow">Regulation</p><h3>Specialized Investment Funds</h3><p>A SEBI category with a ₹10 lakh minimum, allowing strategies such as long-short equity.</p></article>
+        <article class="trend"><p class="eyebrow">Behaviour</p><h3>Step-up SIPs</h3><p>Raising your SIP with your salary each year usually matters more than picking the top fund.</p></article>
+        <article class="trend"><p class="eyebrow">Data</p><h3>Account Aggregator</h3><p>RBI's consent-based framework can show all your accounts in one place, only with your permission.</p></article>
+        <article class="trend"><p class="eyebrow">Legacy</p><h3>Nominations</h3><p>Large sums sit unclaimed in India because accounts lacked nominees. We check every account.</p></article>
+        <article class="trend"><p class="eyebrow">Safety</p><h3>Investment fraud</h3><p>Fake advisory groups are increasing. We never ask for OTPs or passwords and never promise returns.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section band">
+    <div class="wrap band-grid">
+      <div>
+        <p class="eyebrow">Why Simplicity</p>
+        <h2>Run by people who have spent their careers in investing</h2>
+        <p>We started in Pune in 2011. Most families don't need more products. They need fewer, better decisions and someone they trust to keep them on course.</p>
+        <a class="btn btn-band" href="#contact">Meet the team</a>
+      </div>
+      <ul class="values">
+        <li><h3>Personalised</h3><p>Built around your family, not a model portfolio.</p></li>
+        <li><h3>Objective</h3><p>Funds chosen across fund houses. We disclose how we are paid.</p></li>
+        <li><h3>Transparent</h3><p>Every cost and risk, in plain language, on one page.</p></li>
+        <li><h3>Simple</h3><p>If we can't explain it simply, we don't recommend it.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section id="insights" class="section">
+    <div class="wrap">
+      <div class="head head-row">
+        <div class="stack" style="gap:12px"><p class="eyebrow">Knowledge bank</p><h2>Five-minute reads</h2></div>
+        <a class="btn btn-ghost btn-sm" href="https://www.simplicityinvesting.com/knowledge-bank/events">Events &amp; webinars</a>
+      </div>
+      <div class="grid g3" style="gap:24px">
+        <a class="insight" href="#global">
+          <div class="art"><svg viewBox="0 0 160 90" aria-hidden="true"><rect width="160" height="90" fill="var(--tint)"/><circle cx="80" cy="45" r="26" fill="none" stroke="var(--teal-2)" stroke-width="2"/><ellipse cx="80" cy="45" rx="11" ry="26" fill="none" stroke="var(--teal-2)" stroke-width="1.5"/><line x1="54" y1="45" x2="106" y2="45" stroke="var(--teal-2)" stroke-width="1.5"/><circle cx="104" cy="28" r="5" fill="var(--saffron)"/></svg></div>
+          <p class="eyebrow">Global</p><h3>GIFT City for resident Indians: LRS, TCS and tax explained</h3><p class="small muted">7 min read</p>
+        </a>
+        <a class="insight" href="#planner">
+          <div class="art"><svg viewBox="0 0 160 90" aria-hidden="true"><rect width="160" height="90" fill="var(--tint)"/><rect x="30" y="56" width="14" height="20" fill="var(--teal-2)"/><rect x="52" y="48" width="14" height="28" fill="var(--teal-2)"/><rect x="74" y="38" width="14" height="38" fill="var(--teal-2)"/><rect x="96" y="26" width="14" height="50" fill="var(--teal-2)"/><rect x="118" y="12" width="14" height="64" fill="var(--sprout)"/></svg></div>
+          <p class="eyebrow">Retirement</p><h3>How much is enough? Sizing your retirement corpus</h3><p class="small muted">5 min read</p>
+        </a>
+        <a class="insight" href="#solutions">
+          <div class="art"><svg viewBox="0 0 160 90" aria-hidden="true"><rect width="160" height="90" fill="var(--tint)"/><rect x="26" y="28" width="30" height="34" rx="4" fill="none" stroke="var(--teal-2)" stroke-width="2"/><rect x="65" y="22" width="30" height="46" rx="4" fill="var(--teal-2)" fill-opacity=".2" stroke="var(--teal-2)" stroke-width="2"/><rect x="104" y="16" width="30" height="58" rx="4" fill="none" stroke="var(--saffron)" stroke-width="2"/></svg></div>
+          <p class="eyebrow">Explainer</p><h3>SIFs vs mutual funds vs PMS: who should consider what</h3><p class="small muted">6 min read</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="section tint">
+    <div class="wrap narrow">
+      <div class="head"><p class="eyebrow">FAQ</p><h2>Straight answers</h2></div>
+      <div class="faq">
+        <details><summary>How are you paid?</summary><p>We are an AMFI-registered mutual fund distributor (ARN-87401). Fund houses pay us commission, which is included in the expense ratio of regular plans. We disclose it to you as SEBI requires.</p></details>
+        <details><summary>Can a resident Indian invest in GIFT City funds?</summary><p>Yes, in outbound funds that invest abroad, through the RBI's Liberalised Remittance Scheme (up to $250,000 per financial year). Funds that invest into India from GIFT City are for non-residents only.</p></details>
+        <details><summary>Is the 20% TCS an extra tax?</summary><p>No. It is collected by your bank on investment remittances above ₹10 lakh in a financial year and shows in your Form 26AS. You claim it as credit when you file your return. It does affect your cash flow until then.</p></details>
+        <details><summary>Does Saral AI give investment advice?</summary><p>No. Saral explains your portfolio, the likely effect of events, and the options in front of you, and shows the data behind each answer. It never moves money. Any action is discussed and confirmed with a Simplicity expert, in line with SEBI's proposed rules on how AI may be used with clients.</p></details>
+        <details><summary>Which tax regime should I choose?</summary><p>For most salaried people, the new regime now costs less unless their deductions are large (home loan interest, HRA, 80C, NPS). Use the tax planner above to see where you break even, then we can confirm it with your actual figures.</p></details>
+        <details><summary>Do you work with NRIs?</summary><p>Yes. We help with KYC, FATCA declarations, NRE/NRO routing, GIFT City USD funds and fund houses that accept investors from your country.</p></details>
+        <details><summary>Do you hold my money?</summary><p>No. Investments are held in your name with the fund house and its registrar. Payments go directly to the fund house.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section">
+    <div class="wrap contact">
+      <div>
+        <p class="eyebrow">Let's talk</p>
+        <h2>Book a free 30-minute portfolio review</h2>
+        <p class="muted">Bring your statements or just your questions. You'll leave knowing where you stand, whether or not you invest with us.</p>
+        <ul class="clist">
+          <li>Pune, Maharashtra</li>
+          <li>Clients across India and NRIs worldwide</li>
+          <li>Mon–Sat, 10:00–18:00 IST</li>
+        </ul>
+      </div>
+      <form class="form" id="contact-form" novalidate>
+        <div class="field"><label for="c-name">Name</label><input id="c-name" name="name" autocomplete="name" required></div>
+        <div class="field"><label for="c-phone">Mobile / WhatsApp</label><input id="c-phone" name="phone" type="tel" autocomplete="tel" required></div>
+        <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="c-goal">Main interest</label>
+          <select id="c-goal" name="goal"><option>Saral AI portfolio X-ray</option><option>Saral Event Radar alerts</option><option>Tax planning</option><option>Retirement</option><option>Wealth creation</option><option>Global / GIFT City investing</option><option>NRI investing</option><option>Specialized Investment Funds</option><option>Business treasury</option></select>
+        </div>
+        <label class="consent"><input type="checkbox" id="c-consent" required> I agree to be contacted about this enquiry. We never share your data.</label>
+        <button class="btn btn-primary btn-block" type="submit">Request my review</button>
+        <p class="status" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div class="stack">
+      <a class="brand" href="#top">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--sprout)"/><path d="M7 21c4-1 6-4 9-8s5-5 9-5" stroke="var(--foot)" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>
+        <span>Simplicity <span class="lite">Investing</span></span>
+      </a>
+      <p>Simplicity Investing India Pvt Ltd<br>CIN U74140PN2011PTC139962</p>
+      <p>AMFI-registered MFD · ARN-87401</p>
+    </div>
+    <div><h4>Explore</h4><ul><li><a href="#solutions">Solutions</a></li><li><a href="#global">Global investing</a></li><li><a href="#planner">Goal planner</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+    <div><h4>Investor resources</h4><ul><li><a href="https://www.amfiindia.com/">AMFI</a></li><li><a href="https://scores.sebi.gov.in/">SEBI SCORES</a></li><li><a href="https://smartodr.in/">SMART ODR</a></li><li><a href="https://www.ifsca.gov.in/">IFSCA</a></li></ul></div>
+    <div><h4>Follow</h4><ul><li><a href="https://in.linkedin.com/company/simplicity-investing-advisors-india-private-limited">LinkedIn</a></li><li><a href="https://x.com/Simplicity_Inv">X</a></li><li><a href="https://www.facebook.com/simplicityinvesting/">Facebook</a></li></ul></div>
+  </div>
+  <div class="wrap">
+    <div class="disc">
+      <p><strong>Mutual Fund investments are subject to market risks, read all scheme related documents carefully.</strong> Past performance does not indicate future returns.</p>
+      <p>Simplicity Investing is a mutual fund distributor and does not act as a SEBI-registered Investment Adviser. GIFT City products are regulated by IFSCA, not SEBI, are denominated in foreign currency, and carry currency risk. Calculators are illustrations, not recommendations.</p>
+      <p>© <span id="yr">2026</span> Simplicity Investing India Private Limited</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const root = document.documentElement;
+
+  // Theme toggle (remembered per viewer)
+  try { const t = localStorage.getItem("si-theme"); if (t) root.dataset.theme = t; } catch (_) {}
+  $("#theme-btn").addEventListener("click", () => {
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("si-theme", root.dataset.theme); } catch (_) {}
+  });
+
+  // Mobile nav
+  const navBtn = $("#nav-btn"), menu = $("#nav-menu");
+  navBtn.addEventListener("click", () => {
+    const open = menu.classList.toggle("open");
+    navBtn.setAttribute("aria-expanded", String(open));
+  });
+  $$("#nav-menu a").forEach(a => a.addEventListener("click", () => { menu.classList.remove("open"); navBtn.setAttribute("aria-expanded", "false"); }));
+
+  // Indian number formatting
+  const inr = n => {
+    if (n >= 1e7) return "₹" + (n / 1e7).toFixed(2) + " Cr";
+    if (n >= 1e5) return "₹" + (n / 1e5).toFixed(2) + " L";
+    return "₹" + Math.round(n).toLocaleString("en-IN");
+  };
+  const usd = n => "$" + Math.round(n).toLocaleString("en-US");
+
+  // ---------- Tabs ----------
+  // Each tablist controls only its own panels
+  const selectTab = t => {
+    $$('[role="tab"]', t.closest('[role="tablist"]')).forEach(x => {
+      const on = x === t;
+      x.setAttribute("aria-selected", String(on));
+      x.tabIndex = on ? 0 : -1;
+      $("#" + x.getAttribute("aria-controls")).hidden = !on;
+    });
+  };
+  $$('[role="tablist"]').forEach(list => {
+    const tabs = $$('[role="tab"]', list);
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => selectTab(t));
+      t.addEventListener("keydown", e => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+        selectTab(n); n.focus();
+      });
+    });
+  });
+
+  // CTAs that pre-select the enquiry topic in the contact form
+  $$("[data-interest]").forEach(a => a.addEventListener("click", () => { $("#c-goal").value = a.dataset.interest; }));
+
+  // ---------- Tax planner ----------
+  const slab = (inc, bands) => {
+    let tax = 0, prev = 0;
+    for (const [upto, rate] of bands) {
+      if (inc > prev) tax += (Math.min(inc, upto) - prev) * rate;
+      prev = upto;
+    }
+    return tax;
+  };
+  const NEW_BANDS = [[400000, 0], [800000, .05], [1200000, .10], [1600000, .15], [2000000, .20], [2400000, .25], [Infinity, .30]];
+  const OLD_BANDS = [[250000, 0], [500000, .05], [1000000, .20], [Infinity, .30]];
+  const surcharge = (tax, ti, regime) => {
+    const r = ti > 5e7 ? (regime === "new" ? .25 : .37) : ti > 2e7 ? .25 : ti > 1e7 ? .15 : ti > 5e6 ? .10 : 0;
+    return tax * r;
+  };
+  const newTax = (gross, enps) => {
+    const ti = Math.max(0, gross - 75000 - enps);
+    let t = slab(ti, NEW_BANDS);
+    if (ti <= 1200000) t = 0;                       // Sec 87A rebate
+    else t = Math.min(t, ti - 1200000);             // marginal relief just above ₹12 lakh
+    return (t + surcharge(t, ti, "new")) * 1.04;
+  };
+  const oldTaxOn = ti => {
+    let t = slab(ti, OLD_BANDS);
+    if (ti <= 500000) t = 0;                        // Sec 87A rebate
+    return (t + surcharge(t, ti, "old")) * 1.04;
+  };
+  const TX = ["gross", "80c", "80d", "nps", "hl", "hra", "enps"];
+  const tx = Object.fromEntries(TX.map(k => [k, $("#tx-" + k)]));
+  const runTax = () => {
+    const v = Object.fromEntries(TX.map(k => [k, +tx[k].value]));
+    TX.forEach(k => $("#tx-" + k + "-out").textContent = inr(v[k]));
+    const ded = v["80c"] + v["80d"] + v.nps + v.hl + v.hra + v.enps;
+    const nT = newTax(v.gross, v.enps);
+    const oT = oldTaxOn(Math.max(0, v.gross - 50000 - ded));
+    const newWins = nT <= oT;
+    const diff = Math.abs(oT - nT);
+    $("#tx-new").textContent = inr(nT);
+    $("#tx-old").textContent = inr(oT);
+    const mx = Math.max(nT, oT, 1);
+    $("#tx-bar-new").style.width = (nT / mx * 100) + "%";
+    $("#tx-bar-old").style.width = (oT / mx * 100) + "%";
+    $("#tx-win").textContent = (newWins ? "New" : "Old") + " regime wins";
+    $("#tx-save").textContent = diff < 1 ? "Same tax either way" : "Saves " + inr(diff) + " a year";
+
+    // Deductions at which the old regime would match the new one
+    let lo = 0, hi = v.gross;
+    for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; oldTaxOn(Math.max(0, v.gross - 50000 - mid)) > nT ? lo = mid : hi = mid; }
+    $("#tx-break").textContent = nT === 0
+      ? "Your tax under the new regime is zero, so extra deductions cannot lower it further."
+      : `The old regime only wins if your total deductions exceed ${inr(hi)}. Yours are ${inr(ded)}.`;
+
+    const todo = [];
+    const gap80c = 150000 - v["80c"];
+    if (!newWins && gap80c > 0) {
+      const saved = oT - oldTaxOn(Math.max(0, v.gross - 50000 - ded - gap80c));
+      todo.push(["Fill your 80C limit with an ELSS SIP", `Invest ${inr(gap80c)} more (about ${inr(gap80c / 12)} a month). Saves ${inr(saved)} in tax, with a 3-year lock-in.`, "#contact", "Start an ELSS SIP"]);
+    }
+    if (!newWins && v.nps < 50000) {
+      const extra = 50000 - v.nps;
+      const saved = oT - oldTaxOn(Math.max(0, v.gross - 50000 - ded - extra));
+      todo.push(["Add your own NPS contribution", `${inr(extra)} more under 80CCD(1B) saves ${inr(saved)}. Money is locked in until 60.`, "#contact", "Ask about NPS"]);
+    }
+    if (newWins) {
+      todo.push(["Don't buy products just to save tax", "Under the new regime, ELSS and insurance premiums give no tax benefit. Choose investments for your goals instead.", "#planner", "Plan by goal"]);
+      if (diff > 0) todo.push(["Invest the tax you save", `Putting ${inr(diff / 12)} a month into a SIP turns this year's saving into long-term wealth.`, "#planner", "See what it grows to"]);
+    }
+    if (v.enps === 0) todo.push(["Ask your employer about NPS through payroll", "Employer NPS contributions, under 80CCD(2), cut tax in both regimes.", "#contact", "Discuss with us"]);
+    todo.push(["Harvest up to ₹1.25 lakh of equity gains tax-free", "Book long-term gains before 31 March and reinvest them the same day.", "#tax", "Open the harvesting tool"]);
+    $("#tx-todo").innerHTML = todo.slice(0, 4).map(([t, d, h, c]) =>
+      `<li><b>${t}</b><span>${d}</span><a href="${h}" ${h === "#tax" ? 'data-open="tab-harvest"' : ""}>${c} →</a></li>`).join("");
+    $$('#tx-todo [data-open]').forEach(a => a.addEventListener("click", e => { e.preventDefault(); selectTab($("#tab-harvest")); $("#tab-harvest").focus(); }));
+  };
+  TX.forEach(k => tx[k].addEventListener("input", runTax));
+  runTax();
+
+  const hv = { unreal: $("#hv-unreal"), booked: $("#hv-booked") };
+  const runHarvest = () => {
+    const u = +hv.unreal.value, b = +hv.booked.value;
+    $("#hv-unreal-out").textContent = inr(u);
+    $("#hv-booked-out").textContent = inr(b);
+    const room = Math.max(0, 125000 - b);
+    const book = Math.min(u, room);
+    $("#hv-book").textContent = inr(book);
+    $("#hv-save").textContent = inr(book * 0.125 * 1.04);
+    $("#hv-left").textContent = inr(room - book);
+    $("#hv-note").textContent = room === 0
+      ? "You have already used this year's ₹1.25 lakh exemption. Wait until 1 April to harvest again."
+      : book === 0 ? "You have no unbooked long-term gains to harvest." : `Sell ${inr(book)} of gains and reinvest the same day. This resets your purchase price so these gains are never taxed.`;
+  };
+  Object.values(hv).forEach(i => i.addEventListener("input", runHarvest));
+  runHarvest();
+
+  // ---------- Saral AI demo (scripted responses on a sample portfolio) ----------
+  const PV = 4860000;
+  const holdings = [
+    ["Flexi-cap Fund A", .28], ["Nifty 50 Index Fund", .18], ["Mid-cap Fund B", .14], ["Small-cap Fund C", .10],
+    ["Technology Fund D", .08], ["Banking & Financial Fund E", .06], ["US Equity FoF F", .06], ["Short Duration Debt G", .07], ["Gold ETF H", .03],
+  ];
+  const esc = s => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const feed = $("#feed"), suggest = $("#suggest");
+  const say = (who, html) => {
+    const m = document.createElement("div");
+    m.className = "msg " + who;
+    m.innerHTML = who === "bot" ? `<span class="avatar" aria-hidden="true">S</span><div class="bot-body">${html}</div>` : html;
+    feed.appendChild(m);
+    feed.scrollTop = feed.scrollHeight;
+  };
+  const actions = list => `<div class="acts">${list.map(([t, solid, href]) => `<a class="bbtn ${solid ? "solid" : ""}" href="${href || "#contact"}">${t}</a>`).join("")}</div>`;
+
+  const xray = {
+    main: () => `<p>Here's the health check of your sample portfolio, worth ${inr(PV)} across 9 funds.</p>
+      <div class="xcard">
+        <div class="score-row"><span class="big">68<small>/100</small></span><span>Fair. Two items need action now.</span></div>
+        <ul class="find">
+          <li><span class="sev act">Act now</span><span>Equity is 84% against your 70% target. Rebalance about ${inr(PV * .14)} into debt.</span></li>
+          <li><span class="sev act">Act now</span><span>2 of 9 fund folios have no nominee.</span></li>
+          <li><span class="sev rev">Review</span><span>Flexi-cap Fund A and the Nifty 50 Index Fund share about 46% of their holdings.</span></li>
+          <li><span class="sev rev">Review</span><span>Mid-cap Fund B trailed its benchmark in 3 of the last 4 years.</span></li>
+          <li><span class="sev opp">Opportunity</span><span>${inr(110000)} of long-term gains can be booked tax-free this year.</span></li>
+          <li><span class="sev ok">Good</span><span>Your SIPs have run for 36 months without a missed instalment.</span></li>
+        </ul>
+        <p class="meta-line">Data: CAS statement (sample) · benchmarks: fund house factsheets · as of 30 Sep 2026</p>
+      </div>
+      ${actions([["Get my rebalancing plan", true], ["Fix nominations", false]])}`,
+    "Why is my equity so high?": () => `<p>Strong equity returns have pushed equity to 84% of your portfolio against a 70% target. That raises your risk.</p>
+      <div class="xcard"><h4>What a 20% market fall would cost</h4>
+        <div class="bars">
+          <div class="bar-row"><span class="nm">At 84% equity (today)</span><div class="track"><i style="right:50%;width:${(PV*.84*.2)/PV*100*2.5}%;background:var(--band-neg)"></i></div><span class="v">−${inr(PV*.84*.2)}</span></div>
+          <div class="bar-row"><span class="nm">At 70% equity (plan)</span><div class="track"><i style="right:50%;width:${(PV*.7*.2)/PV*100*2.5}%;background:var(--band-neg)"></i></div><span class="v">−${inr(PV*.7*.2)}</span></div>
+        </div>
+        <p class="next">Next step: move about ${inr(PV * .14)} from equity to debt over 3 months, selling the units with the lowest tax first.</p>
+      </div>${actions([["Get my rebalancing plan", true]])}`,
+    "Which funds overlap?": () => `<p>Flexi-cap Fund A and the Nifty 50 Index Fund hold many of the same large companies. They share about 46% of their holdings.</p>
+      <div class="xcard"><p>Together they are 46% of your portfolio, so you are paying two fund managers for much of the same exposure. One option is to send new SIPs to an area you hold little of, such as international or debt, instead of the index fund.</p>
+      <p class="meta-line">Overlap measured on latest monthly portfolio disclosures (sample)</p></div>
+      ${actions([["Review my fund list", true]])}`,
+    "Show my tax-harvest opportunity": () => `<p>You have about ${inr(110000)} of unbooked long-term gains in equity funds.</p>
+      <div class="xcard"><p>Booking them before 31 March and reinvesting the same day uses this year's ₹1.25 lakh exemption. It avoids about <b>${inr(110000 * .125 * 1.04)}</b> of future tax. Check exit loads on Mid-cap Fund B first.</p></div>
+      ${actions([["Open the harvesting tool", true, "#tax"]])}`,
+  };
+
+  const events = {
+    "Crude oil jumps 20%": { s: [-3, -3, -5, -6, -1, -4, 0, -.5, 2], why: ["India imports most of its crude, so the trade deficit widens and the rupee comes under pressure.", "Higher fuel and input costs hit mid and small companies harder than large ones.", "Gold tends to rise when inflation worries grow."], dos: ["Keep SIPs running. Past oil shocks caused temporary falls.", "Check your debt allocation is at target before adding equity."], donts: ["Don't sell equity funds on the headline.", "Don't chase energy stocks after the move."], conf: "Medium" },
+    "US Fed cuts rates by 0.5%": { s: [3, 3, 4, 4, 2, 3, 3, .8, 2], why: ["Lower US rates tend to bring foreign investment into Indian equities.", "Bond prices rise as yields fall, helping your debt fund.", "A weaker dollar can lift gold and US equities."], dos: ["Use the rally to rebalance toward your 70% equity target.", "Keep your debt fund. It gains when rates fall."], donts: ["Don't raise equity above plan because markets feel good."], conf: "Medium" },
+    "Rupee weakens to ₹92 per US$": { s: [-1.5, -1.5, -2, -2, 4, -2, 3, -.3, 3], why: ["IT companies earn in dollars, so a weaker rupee raises their profits.", "Your US fund and gold are priced in dollars, so their rupee value rises.", "Importers and domestic sectors face higher costs."], dos: ["Note how your global holdings cushion a weaker rupee.", "Consider moving international exposure toward 10% via GIFT City."], donts: ["Don't buy dollar assets in a panic after a sharp move."], conf: "High" },
+    "US tariffs on Indian IT services": { s: [-2, -2, -1, -1, -9, -.5, 0, .2, 1], why: ["Higher costs for US clients could slow orders for Indian IT companies.", "Your Technology Fund D is most exposed. Diversified funds hold some IT too.", "Domestic sectors are largely unaffected."], dos: ["Check that IT is not over 15% of your total equity across all funds.", "Review Technology Fund D at your next rebalance."], donts: ["Don't exit the sector fund on news alone. Tariffs are often negotiated."], conf: "Low" },
+    "Middle East conflict escalates": { s: [-4, -4, -6, -7, -2, -5, -2, .3, 5], why: ["Risk-off selling usually hits mid and small caps hardest.", "Oil supply fears add pressure on India specifically.", "Gold is your hedge in this scenario."], dos: ["Stay invested. Keep your emergency fund untouched.", "If equity falls below target, top up in steps."], donts: ["Don't stop SIPs. Falls are when SIPs buy the most units."], conf: "Low" },
+  };
+  const radar = name => {
+    const e = events[name];
+    const rows = holdings.map(([n, w], i) => ({ n, w, s: e.s[i] }));
+    const pct = rows.reduce((a, r) => a + r.w * r.s, 0);
+    const amt = pct / 100 * PV;
+    const bars = rows.map(r => {
+      const width = Math.min(Math.abs(r.s) / 10 * 50, 50);
+      const pos = r.s >= 0;
+      return `<div class="bar-row"><span class="nm">${r.n}</span><div class="track"><i style="${pos ? "left" : "right"}:50%;width:${width}%;background:var(${pos ? "--band-pos" : "--band-neg"})"></i></div><span class="v">${pos ? "+" : ""}${r.s}%</span></div>`;
+    }).join("");
+    return `<p>Estimated short-term impact on your sample portfolio:</p>
+      <div class="xcard">
+        <div class="score-row"><span class="impact-big ${amt < 0 ? "neg" : "pos"}">${amt < 0 ? "−" : "+"}${inr(Math.abs(amt))}</span><span>${pct >= 0 ? "+" : ""}${pct.toFixed(1)}% of ${inr(PV)}</span></div>
+        <h4>Impact by holding</h4><div class="bars">${bars}</div>
+        <h4>Why</h4><ul style="margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:.9rem">${e.why.map(w => `<li>${w}</li>`).join("")}</ul>
+        <div class="cols2"><div><h5>Do</h5><ul>${e.dos.map(x => `<li>${x}</li>`).join("")}</ul></div><div><h5>Don't</h5><ul>${e.donts.map(x => `<li>${x}</li>`).join("")}</ul></div></div>
+        <p class="meta-line">Confidence: ${e.conf} · scenario model based on past sector sensitivities, not a forecast</p>
+      </div>${actions([["Alert me on WhatsApp for events like this", true], ["Discuss with an expert", false]])}`;
+  };
+
+  const desk = {
+    "Markets fell 8%. Should I stop my SIP?": { plan: "Your retirement goal is 22 years away. Your plan already assumes several falls of 20–30% along the way.", opts: [["Continue the SIP", "Buys more units at lower prices; plan stays on track", "Portfolio may fall further in the short term"], ["Pause for 3 months", "Feels safer", "Misses lower prices; pauses often become permanent"], ["Top up once", "Lowers your average cost further", "Only if your emergency fund is full"]], next: "Continue your SIP. Your goal does not need any change." },
+    "I got a ₹10 lakh bonus. Where should it go?": { plan: "Your emergency fund covers 4 of the 6 months you need, and equity is above your target.", opts: [["Fill the emergency fund", "Covers job or health shocks", "Earns less than equity"], ["Rebalance into debt", "Brings equity back toward 70%", "Lower expected return on that money"], ["Prepay the home loan", "Guaranteed saving at your loan rate", "Money becomes hard to access"]], next: `Split it: ${inr(240000)} to the emergency fund, ${inr(500000)} to a debt fund to rebalance, and ${inr(260000)} toward your child's education goal.` },
+    "Should I move money to GIFT City funds?": { plan: "International is 6% of your portfolio against a 10% target, and Indian international funds are closed to new SIPs.", opts: [["GIFT City outbound fund", "Regulated global access, no US estate tax", "$5,000 minimum; 20% TCS above ₹10 lakh a year"], ["Wait for Indian funds to reopen", "No LRS paperwork", "Reopening date is unknown"], ["US ETFs via NSE IX", "Low cost, fractional shares", "Direct US holdings can attract US estate tax"]], next: `Add about ${inr(PV * .04)} (4%) through a GIFT City outbound fund, sent in one remittance. If your total remittances this year stay under ₹10 lakh, no TCS applies.` },
+    "Is it time to book profits in small caps?": { plan: "Small caps are 10% of your portfolio against an 8% target.", opts: [["Trim to target", "Locks in gains; lowers risk", "Gains above the exemption are taxed"], ["Hold", "Keeps upside", "Risk stays above plan"], ["Exit completely", "Removes small-cap risk", "Abandons a part of your plan that's working"]], next: `Trim about ${inr(PV * .02)} to get back to 8%. Sell units held over 12 months first, to use your ₹1.25 lakh tax-free limit.` },
+  };
+  const deskReply = q => {
+    const d = desk[q];
+    return `<p>Here's your decision brief.</p>
+      <div class="xcard">
+        <h4>What your plan says</h4><p>${d.plan}</p>
+        <h4>Your options</h4>
+        <div style="overflow-x:auto"><table class="opt-table"><thead><tr><th>Option</th><th>Upside</th><th>Downside</th></tr></thead><tbody>${d.opts.map(o => `<tr><td><b>${o[0]}</b></td><td>${o[1]}</td><td>${o[2]}</td></tr>`).join("")}</tbody></table></div>
+        <p class="next"><b>Suggested next step:</b> ${d.next}</p>
+        <p class="meta-line">Based on your goals, risk profile and sample holdings · final decision with your Simplicity expert</p>
+      </div>${actions([["Book a 15-minute decision call", true], ["Save to my plan", false]])}`;
+  };
+
+  const modes = {
+    xray: { intro: () => { say("user", "Give me a health check of my portfolio."); say("bot", xray.main()); }, chips: Object.keys(xray).filter(k => k !== "main"), run: q => xray[q]() },
+    radar: { intro: () => say("bot", "<p>Pick a global event, or type one. I'll estimate how it would move each fund in your portfolio and what to do about it.</p>"), chips: Object.keys(events), run: radar },
+    desk: { intro: () => say("bot", "<p>Facing a money decision? I'll check it against your plan, lay out the options and suggest a next step. An expert confirms before anything happens.</p>"), chips: Object.keys(desk), run: deskReply },
+  };
+  let mode = "xray";
+  const setMode = m => {
+    mode = m;
+    $$(".mode").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+    feed.innerHTML = "";
+    modes[m].intro();
+    suggest.innerHTML = modes[m].chips.map(c => `<button class="sg" type="button">${c}</button>`).join("");
+    $$(".sg", suggest).forEach(b => b.addEventListener("click", () => ask(b.textContent, m)));
+    feed.scrollTop = 0;
+  };
+  const ask = (q, m) => {
+    if (m !== mode) setMode(m);
+    say("user", esc(q));
+    say("bot", modes[m].run(q));
+  };
+  // Free-text questions are matched to the closest scripted answer in this prototype
+  const routesByKeyword = [
+    [/sip|fell|crash|fall/i, "desk", "Markets fell 8%. Should I stop my SIP?"],
+    [/bonus|lump|windfall/i, "desk", "I got a ₹10 lakh bonus. Where should it go?"],
+    [/gift|global|international|abroad/i, "desk", "Should I move money to GIFT City funds?"],
+    [/small ?cap|profit/i, "desk", "Is it time to book profits in small caps?"],
+    [/oil|crude/i, "radar", "Crude oil jumps 20%"],
+    [/fed|rate cut|interest rate/i, "radar", "US Fed cuts rates by 0.5%"],
+    [/rupee|dollar|inr|usd/i, "radar", "Rupee weakens to ₹92 per US$"],
+    [/tariff|trump|it sector|tech/i, "radar", "US tariffs on Indian IT services"],
+    [/war|conflict|middle east|iran|israel/i, "radar", "Middle East conflict escalates"],
+    [/overlap|duplicate/i, "xray", "Which funds overlap?"],
+    [/tax|harvest/i, "xray", "Show my tax-harvest opportunity"],
+    [/equity|allocation|risk|rebalanc/i, "xray", "Why is my equity so high?"],
+  ];
+  $("#ask-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const input = $("#ask-input"), q = input.value.trim();
+    if (!q) return;
+    input.value = "";
+    const hit = routesByKeyword.find(([re]) => re.test(q));
+    if (hit) {
+      if (hit[1] !== mode) setMode(hit[1]);
+      say("user", esc(q));
+      say("bot", `<p class="meta-line">Closest match in this demo: "${hit[2]}"</p>` + modes[hit[1]].run(hit[2]));
+    } else {
+      say("user", esc(q));
+      say("bot", "<p>In the live version I'll answer this from your own portfolio. In this demo, try one of the suggested questions below.</p>");
+    }
+  });
+  $$(".mode").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  setMode("xray");
+
+  $("#cas-file").addEventListener("change", e => {
+    const f = e.target.files[0];
+    $("#cas-status").textContent = f ? `Prototype: "${f.name}" stays on your device. The demo above uses a sample portfolio.` : "";
+  });
+
+  // ---------- Route finder ----------
+  const routes = {
+    "resident-global": { name: "GIFT City outbound fund", why: "A single fund holding a global portfolio. No US estate tax exposure, and one holding to report.", min: "$500 – $5,000 depending on fund", how: "LRS remittance to an IFSC account", tax: "Fund pays tax at trust level (check each fund)" },
+    "resident-stocks": { name: "NSE IX Global Access", why: "Buy US-listed stocks and ETFs, including fractional shares, through a GIFT City broker.", min: "Fractional shares possible", how: "LRS remittance, converted to USD in GIFT City", tax: "You pay Indian tax on gains", warn: "Direct US holdings above $60,000 can attract US estate tax of up to 40%." },
+    "resident-india": { name: "Regular Indian mutual funds", why: "Inbound GIFT City funds are for non-residents. As a resident, invest in India through normal rupee mutual funds.", min: "From ₹500 SIP", how: "Rupee SIP or lump sum", tax: "Indian mutual fund tax rules" },
+    "resident-fd": { name: "Rupee debt funds or deposits", why: "USD deposits in GIFT City are designed mainly for non-residents. For residents, we would look at debt funds or bank deposits in rupees.", min: "Varies", how: "Rupee investment", tax: "As per income tax slab" },
+    "nri-global": { name: "GIFT City outbound fund", why: "Hold a global portfolio in USD from an Indian-regulated fund, without going through LRS.", min: "$500 – $5,000 depending on fund", how: "Direct foreign-currency transfer", tax: "Fund-level taxation; check your country of residence" },
+    "nri-stocks": { name: "NSE IX Global Access", why: "US stocks through a GIFT City broker in USD.", min: "Fractional shares possible", how: "Direct foreign-currency transfer", tax: "Depends on your country of residence", warn: "Direct US holdings above $60,000 can attract US estate tax for non-US persons." },
+    "nri-india": { name: "GIFT City inbound (feeder) fund", why: "Invest in Indian equities in USD. Marketed with no Indian capital gains tax or TDS, and full repatriation.", min: "From $500 (e.g. Tata India Dynamic Equity)", how: "Direct foreign-currency transfer, no NRE/NRO needed", tax: "Concessional; confirm with a CA" },
+    "nri-fd": { name: "USD fixed deposit in GIFT City", why: "Earn interest in US dollars with banks' IFSC units. Principal and interest are repatriable.", min: "Varies by bank", how: "Direct foreign-currency transfer", tax: "Interest generally not taxed in India for non-residents; confirm" },
+  };
+  const finder = $("#finder-form"), routeOut = $("#route-out");
+  const renderRoute = () => {
+    const key = finder.res.value + "-" + finder.want.value;
+    const r = routes[key];
+    routeOut.innerHTML = `
+      <p class="eyebrow">Suggested route</p>
+      <h3>${r.name}</h3>
+      <p>${r.why}</p>
+      <dl><dt>Minimum</dt><dd class="num">${r.min}</dd><dt>How money moves</dt><dd>${r.how}</dd><dt>Tax</dt><dd>${r.tax}</dd></dl>
+      ${r.warn ? `<p class="warn">${r.warn}</p>` : ""}
+      <a class="btn btn-primary btn-sm" href="#contact" style="justify-self:start">Talk to us about this route</a>`;
+  };
+  finder.addEventListener("change", renderRoute);
+  renderRoute();
+
+  // ---------- LRS & TCS calculator ----------
+  const T = { prior: $("#t-prior"), add: $("#t-new"), fx: $("#t-fx") };
+  const LRS = 250000, TCS_FREE = 1000000, TCS_RATE = 0.2;
+  const calcTcs = () => {
+    const prior = +T.prior.value, add = +T.add.value, fx = +T.fx.value;
+    $("#t-prior-out").textContent = inr(prior);
+    $("#t-new-out").textContent = inr(add);
+    $("#t-fx-out").textContent = "₹" + fx.toFixed(1);
+    // TCS applies only to the part of this remittance that crosses ₹10 lakh for the year
+    const taxable = Math.max(0, prior + add - TCS_FREE) - Math.max(0, prior - TCS_FREE);
+    const tcs = taxable * TCS_RATE;
+    const usedUsd = (prior + add) / fx;
+    const left = LRS - usedUsd;
+    $("#t-tcs").textContent = inr(tcs);
+    $("#t-debit").textContent = inr(add + tcs);
+    $("#t-usd").textContent = usd(add / fx);
+    $("#t-left").textContent = left >= 0 ? usd(left) : "Over limit";
+    $("#m-prior").style.width = Math.min(prior / fx / LRS * 100, 100) + "%";
+    $("#m-new").style.width = Math.max(0, Math.min(usedUsd / LRS * 100, 100) - Math.min(prior / fx / LRS * 100, 100)) + "%";
+    const note = $("#t-note");
+    if (left < 0) { note.textContent = "This exceeds the $250,000 LRS limit for the year. Reduce the amount or split it across financial years."; note.style.color = "var(--warn)"; }
+    else if (tcs > 0) { note.textContent = `The ${inr(tcs)} TCS appears in your Form 26AS. You claim it as credit when you file your return.`; note.style.color = "var(--muted)"; }
+    else { note.textContent = "No TCS: your total investment remittances this year stay within ₹10 lakh."; note.style.color = "var(--good)"; }
+  };
+  Object.values(T).forEach(i => i.addEventListener("input", calcTcs));
+  calcTcs();
+
+  // ---------- Fund shelf (example data) ----------
+  const funds = [
+    { n: "DSP Global Equity Fund", amc: "DSP · IFSC", dir: "Outbound", res: true, min: 5000, d: "Globally diversified equity. Launched June 2025." },
+    { n: "Marcellus Global Equities", amc: "Marcellus · IFSC", dir: "Outbound", res: true, min: null, d: "Concentrated global quality-stock portfolio." },
+    { n: "Edelweiss Greater China Equity", amc: "Edelweiss · IFSC", dir: "Outbound", res: true, min: null, d: "Single-region exposure to Chinese equities." },
+    { n: "Tata India Dynamic Equity", amc: "Tata AMC · IFSC", dir: "Inbound", res: false, min: 500, d: "Indian equities in USD. Launched September 2025." },
+    { n: "Kotak Iconic India Equity Feeder", amc: "Kotak · IFSC", dir: "Inbound", res: false, min: null, d: "Feeds into a mainland Indian equity scheme." },
+    { n: "Sundaram India Mid Cap", amc: "Sundaram · IFSC", dir: "Inbound", res: false, min: null, d: "Indian mid-cap exposure in USD." },
+  ];
+  const shelf = $("#shelf");
+  const renderShelf = f => {
+    const list = funds.filter(x => f === "all" || (f === "resident" && x.res) || (f === "nri" && !x.res) || (f === "low" && x.min !== null && x.min < 1000));
+    shelf.innerHTML = list.map(x => `
+      <article class="fund">
+        <div class="fund-top"><h3>${x.n}</h3></div>
+        <div class="meta"><span class="tagm">${x.dir}</span><span class="tagm ${x.res ? "res" : ""}">${x.res ? "Residents + NRIs" : "NRIs only"}</span></div>
+        <p>${x.d}</p>
+        <p class="min">Minimum: ${x.min ? usd(x.min) : "see offer document"}</p>
+        <p class="fine">${x.amc}</p>
+      </article>`).join("") || `<p class="muted">No funds match this filter.</p>`;
+  };
+  $$(".chip").forEach(c => c.addEventListener("click", () => {
+    $$(".chip").forEach(x => x.setAttribute("aria-pressed", String(x === c)));
+    renderShelf(c.dataset.f);
+  }));
+  renderShelf("all");
+
+  // ---------- Goal planner ----------
+  const presets = {
+    retirement: { cost: 30000000, years: 25, saved: 1000000 },
+    education: { cost: 2500000, years: 12, saved: 200000 },
+    home: { cost: 8000000, years: 7, saved: 1000000 },
+    freedom: { cost: 60000000, years: 20, saved: 3000000 },
+  };
+  const ids = ["cost", "years", "saved", "ret", "inf", "step"];
+  const el = Object.fromEntries(ids.map(id => [id, $("#" + id)]));
+  const out = Object.fromEntries(ids.map(id => [id, $("#" + id + "-out")]));
+
+  function sipCorpus(monthly, years, annualRet, stepUp) {
+    const r = annualRet / 12;
+    let value = 0, invested = 0, sip = monthly;
+    const series = [{ value: 0, invested: 0 }];
+    for (let y = 0; y < years; y++) {
+      for (let m = 0; m < 12; m++) { value = (value + sip) * (1 + r); invested += sip; }
+      series.push({ value, invested });
+      sip *= 1 + stepUp;
+    }
+    return { value, series };
+  }
+  function solve() {
+    const cost = +el.cost.value, years = +el.years.value, saved = +el.saved.value;
+    const ret = +el.ret.value / 100, inf = +el.inf.value / 100, step = +el.step.value / 100;
+    out.cost.textContent = inr(cost);
+    out.years.textContent = years + (years === 1 ? " yr" : " yrs");
+    out.saved.textContent = inr(saved);
+    out.ret.textContent = el.ret.value + "%";
+    out.inf.textContent = el.inf.value + "%";
+    out.step.textContent = el.step.value + "%";
+    const future = cost * Math.pow(1 + inf, years);
+    const gap = Math.max(future - saved * Math.pow(1 + ret, years), 0);
+    const need = gap / sipCorpus(1, years, ret, step).value;
+    const flat = gap / sipCorpus(1, years, ret, 0).value;
+    $("#future-cost").textContent = inr(future);
+    $("#sip-need").textContent = gap === 0 ? "₹0, you're covered" : inr(need) + "/mo";
+    $("#sip-flat").textContent = gap === 0 ? "—" : inr(flat) + "/mo";
+    const pts = sipCorpus(need, years, ret, step).series.map((p, i) => ({ value: p.value + saved * Math.pow(1 + ret, i), invested: p.invested + saved }));
+    drawPlanner(pts, years);
+  }
+  function drawPlanner(pts, years) {
+    const svg = $("#planner-chart");
+    const W = 400, H = 170, L = 8, R = 8, T = 10, B = 22;
+    const max = Math.max(...pts.map(p => p.value), 1);
+    const x = i => L + (i / Math.max(pts.length - 1, 1)) * (W - L - R);
+    const y = v => T + (1 - v / max) * (H - T - B);
+    const line = k => pts.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p[k]).toFixed(1)).join(" ");
+    const last = pts[pts.length - 1];
+    svg.innerHTML = `
+      <line x1="${L}" y1="${y(0)}" x2="${W - R}" y2="${y(0)}" stroke="var(--line)"/>
+      <line x1="${L}" y1="${y(max / 2)}" x2="${W - R}" y2="${y(max / 2)}" stroke="var(--line)" stroke-dasharray="2 4"/>
+      <path d="${line("value")} L${x(pts.length - 1)} ${y(0)} L${x(0)} ${y(0)} Z" fill="var(--sprout)" fill-opacity=".14"/>
+      <path d="${line("value")}" fill="none" stroke="var(--sprout)" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="${line("invested")}" fill="none" stroke="var(--teal-2)" stroke-width="2" stroke-dasharray="5 4"/>
+      <circle cx="${x(pts.length - 1)}" cy="${y(last.value)}" r="4" fill="var(--sprout)"/>
+      <text x="${L}" y="${H - 6}" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--muted)">Today</text>
+      <text x="${W - R}" y="${H - 6}" font-size="11" font-family="IBM Plex Mono, monospace" fill="var(--muted)" text-anchor="end">Year ${years}</text>`;
+  }
+  ids.forEach(id => el[id].addEventListener("input", solve));
+  $$('input[name="goal"]').forEach(r => r.addEventListener("change", () => {
+    const p = presets[r.value];
+    el.cost.value = p.cost; el.years.value = p.years; el.saved.value = p.saved;
+    solve();
+  }));
+  solve();
+
+  // ---------- Money health check ----------
+  const qs = [
+    { q: "How many months of expenses does your emergency fund cover?", o: [["Less than 1 month", 0, "Build an emergency fund of 6 months' expenses in a liquid fund before investing aggressively."], ["1–3 months", 1, "Top up your emergency fund to 6 months of expenses."], ["6 months or more", 2]] },
+    { q: "Do you have term life cover of at least 10 times your annual income?", o: [["No, or not sure", 0, "If anyone depends on your income, buy term cover of 10–15 times your annual income."], ["Some, but less than 10 times", 1, "Check whether your life cover matches your actual liabilities."], ["Yes", 2]] },
+    { q: "Does every family member have health insurance beyond employer cover?", o: [["No", 0, "Buy a family floater health policy. Employer cover ends when the job does."], ["Partly", 1, "A super top-up can raise health cover at low cost."], ["Yes", 2]] },
+    { q: "Do you invest a fixed amount every month towards named goals?", o: [["No", 0, "Set up an automatic SIP for each goal."], ["Yes, but not linked to goals", 1, "Link each SIP to a goal so you know what enough looks like."], ["Yes, linked to goals", 2]] },
+    { q: "Are nominations updated on all your bank, demat and mutual fund accounts?", o: [["Not sure", 0, "Check and update nominations on every account."], ["Some of them", 1, "Complete nominations on the remaining accounts."], ["All of them", 2]] },
+  ];
+  const qb = $("#quiz-body"), qbar = $("#qbar");
+  let qi = 0, score = 0, tips = [];
+  const renderQ = () => {
+    qbar.style.width = (qi / qs.length) * 100 + "%";
+    if (qi >= qs.length) return renderResult();
+    const { q, o } = qs[qi];
+    qb.innerHTML = `<p class="small muted">Question ${qi + 1} of ${qs.length}</p><p class="quiz-q">${q}</p>
+      <div class="opts">${o.map((x, i) => `<button class="opt" type="button" data-i="${i}">${x[0]}</button>`).join("")}</div>`;
+    $$(".opt", qb).forEach(b => b.addEventListener("click", () => {
+      const x = o[+b.dataset.i];
+      score += x[1]; if (x[2]) tips.push(x[2]);
+      qi++; renderQ();
+    }));
+  };
+  const renderResult = () => {
+    const pct = Math.round(score / (qs.length * 2) * 100);
+    const label = pct >= 80 ? "Strong foundation" : pct >= 50 ? "Good start, a few gaps" : "Fix the basics first";
+    const C = 2 * Math.PI * 54;
+    qb.innerHTML = `<div class="qres">
+      <svg width="132" height="132" viewBox="0 0 132 132" role="img" aria-label="Score ${pct} out of 100">
+        <circle cx="66" cy="66" r="54" fill="none" stroke="var(--tint)" stroke-width="12"/>
+        <circle cx="66" cy="66" r="54" fill="none" stroke="var(--sprout)" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct / 100)}" transform="rotate(-90 66 66)"/>
+        <text x="66" y="76" text-anchor="middle" font-size="30" font-family="IBM Plex Mono, monospace" fill="var(--ink)">${pct}</text>
+      </svg>
+      <h3>${label}</h3>
+      ${tips.length ? `<ul>${tips.map(t => `<li>${t}</li>`).join("")}</ul>` : `<p class="muted">You've covered the essentials. Next, check that your asset mix still fits your goals.</p>`}
+      <div class="acts"><a class="btn btn-primary" href="#contact">Discuss my results</a><button class="btn btn-ghost" type="button" id="q-again">Retake</button></div></div>`;
+    $("#q-again").addEventListener("click", () => { qi = 0; score = 0; tips = []; renderQ(); });
+  };
+  renderQ();
+
+  // ---------- Contact form (prototype: no submission) ----------
+  const form = $("#contact-form");
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const status = $(".status", form);
+    let ok = true;
+    $$("[required]", form).forEach(f => {
+      const valid = f.type === "checkbox" ? f.checked : f.checkValidity() && f.value.trim() !== "";
+      f.setAttribute("aria-invalid", String(!valid));
+      if (!valid) ok = false;
+    });
+    status.style.color = ok ? "var(--good)" : "var(--warn)";
+    status.textContent = ok ? "Prototype: the form works, but nothing is sent yet." : "Fill in the highlighted fields.";
+  });
+
+  $("#yr").textContent = new Date().getFullYear();
+})();
+</script>
